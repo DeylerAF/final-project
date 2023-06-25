@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MySketch</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js" defer></script>
+</head>
+
+<body>
+    <h1>MySketch</h1>
+    <div>
+        <div>
+            <label for="line-width">Line Width:</label>
+            <input type="range" id="line-width" min="1" max="50" value="1">
+        </div>
+        <div>
+            <label for="color-picker">Color:</label>
+            <input type="color" id="color-picker" value="#000000">
+        </div>
+        <div>
+            <label for="line-type">Line Type:</label>
+            <input type="radio" id="line-type-round" name="line-type" value="round" checked>
+            <label for="line-type-round">Round</label>
+            <input type="radio" id="line-type-square" name="line-type" value="square">
+            <label for="line-type-square">Square</label>
+        </div>
+        <div>
+            <label for="eraser-mode">Eraser Mode:</label>
+            <input type="checkbox" id="eraser-mode">
+        </div>
+    </div>
+    <div>
+        <button id="load-image">Load Image</button>
+        <button id="save-image">Save Image</button>
+        <button id="clear-canvas">Clear Canvas</button>
+    </div>
+    <canvas id="board" width="600" height="400">
+        Tu navegador no soporta HTML5 canvas.
+    </canvas>
+</body>
+
+</html>
