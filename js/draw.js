@@ -17,6 +17,9 @@ class Board {
         this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
         this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
         this.canvas.addEventListener('mouseout', this.handleMouseOut.bind(this));
+        this.canvas.addEventListener('touchstart', this.handleTouchStart.bind(this));
+        this.canvas.addEventListener('touchmove', this.handleTouchMove.bind(this));
+        this.canvas.addEventListener('touchend', this.handleTouchEnd.bind(this));
 
         this.lineWidthInput = document.getElementById('line-width');
         this.lineWidthInput.addEventListener('change', this.handleLineWidthChange.bind(this));
@@ -69,6 +72,23 @@ class Board {
     }
 
     handleMouseOut(event) {
+        this.stopDrawing();
+    }
+
+    handleTouchStart(event) {
+        const x = event.touches[0].clientX - this.canvas.offsetLeft;
+        const y = event.touches[0].clientY - this.canvas.offsetTop;
+        this.startDrawing(x, y);
+    }
+
+    handleTouchMove(event) {
+        event.preventDefault();
+        const x = event.touches[0].clientX - this.canvas.offsetLeft;
+        const y = event.touches[0].clientY - this.canvas.offsetTop;
+        this.draw(x, y);
+    }
+
+    handleTouchEnd(event) {
         this.stopDrawing();
     }
 
