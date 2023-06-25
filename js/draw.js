@@ -7,9 +7,12 @@ class Board {
         this.lastY = 0;
         this.color = window.getComputedStyle(this.canvas).colorPicker;
         this.lineWidth = window.getComputedStyle(this.canvas).lineWidthInput;
-        this.lineCap = 'round';
-        this.backgroundColor = window.getComputedStyle(this.canvas).backgroundColor;
+        this.boardColor = window.getComputedStyle(this.canvas).backgroundColor;
 
+        // Add event listener to window object to make canvas responsive
+        this.boardSize = window.addEventListener('resize', this.handleResize.bind(this));
+
+        this.setCanvasDimensions();
         this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
         this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
         this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
@@ -40,6 +43,15 @@ class Board {
         this.clearCanvasButton.addEventListener('click', this.handleClearCanvas.bind(this));
     }
 
+    handleResize() {
+        this.setCanvasDimensions();
+    }
+    
+    setCanvasDimensions() {
+        this.canvas.width = this.canvas.parentElement.clientWidth;
+        this.canvas.height = this.canvas.parentElement.clientHeight;
+    }
+
     handleMouseDown(event) {
         const x = event.offsetX;
         const y = event.offsetY;
@@ -66,6 +78,7 @@ class Board {
 
     handleColorChange(event) {
         this.setColor(event.target.value);
+        this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
     }
 
     handleLineTypeChange(event) {
@@ -122,8 +135,7 @@ class Board {
 
     setEraserMode(eraserMode) {
         this.eraserMode = eraserMode;
-        this.color = eraserMode ? this.backgroundColor : this.colorPicker.value;
-        this.lineCap = this.lineTypeRound.checked ? 'round' : 'square';
+        this.color = eraserMode ? this.boardColor : this.colorPicker.value;
     }
 
     startDrawing(x, y) {
@@ -151,13 +163,11 @@ class Board {
         };
         image.src = imageUrl;
     }
-
-    resize(width, height) {
-        const imageData = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        this.canvas.width = width;
-        this.canvas.height = height;
-        this.context.putImageData(imageData, 0, 0);
-    }
 }
 
 const myBoard = new Board('board');
+myBoard.setLineWidth(myBoard.lineWidthInput.value);
+myBoard.setLineType(myBoard.lineTypeRound.checked ? 'round' : 'square');
+myBoard.setColor(myBoard.colorPicker.value);
+
+console.log(myBoard);
