@@ -10,6 +10,7 @@ class Board {
         this.eraserMode = false;
         this.pickedColor = this.colorPicker;
         this.hue = 0; // Add a hue property to keep track of the current hue value
+        this.mirrorMode = false; // Add a mirrorMode property to keep track of the mirror mode
 
         // Add event listener to window object to make canvas responsive
         this.boardSize = window.addEventListener('resize', this.handleResize.bind(this));
@@ -34,6 +35,9 @@ class Board {
 
         this.lineTypeSquare = document.getElementById('line-type-square');
         this.lineTypeSquare.addEventListener('change', this.handleLineTypeChange.bind(this));
+
+        this.mirrorModeCheckbox = document.getElementById('mirror-mode');
+        this.mirrorModeCheckbox.addEventListener('change', this.handleMirrorModeChange.bind(this));
 
         this.rainbowModeCheckbox = document.getElementById('rainbow-mode');
         this.rainbowModeCheckbox.addEventListener('change', this.handleRainbowModeChange.bind(this));
@@ -113,6 +117,10 @@ class Board {
         this.setLineType(event.target.value);
     }
 
+    handleMirrorModeChange(event) {
+        this.setMirrorMode(event.target.checked);
+    }
+
     handleRainbowModeChange(event) {
         this.setRainbowMode(event.target.checked);
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
@@ -126,10 +134,7 @@ class Board {
     }
 
     handleLoadImage(event) {
-        const imageUrl = prompt('Enter the URL of the image:');
-        if (imageUrl) {
-            this.loadImage(imageUrl);
-        }
+        this.loadImage();
     }
 
     handleSaveImage(event) {
@@ -145,16 +150,22 @@ class Board {
         this.context.beginPath();
         this.context.moveTo(this.lastX, this.lastY);
         this.context.lineTo(x, y);
-        this.hue = (this.hue + 1) % 360; // Increment the hue value
+        this.hue = (this.hue + 1) % 361; // Increment the hue value
         if (this.rainbowMode) {
             this.context.strokeStyle = `hsl(${this.hue}, 100%, 50%)`;
-            console.log(this.hue); // Use the current hue value
         } else {
             this.context.strokeStyle = this.color;
         }
         this.context.lineWidth = this.lineWidth;
         this.context.lineCap = this.lineCap;
         this.context.stroke();
+        if (this.mirrorMode) { // Draw a mirrored line if mirrorMode is active
+            const mirrorX = this.canvas.width - x;
+            this.context.beginPath();
+            this.context.moveTo(mirrorX, y);
+            this.context.lineTo(this.canvas.width - this.lastX, this.lastY);
+            this.context.stroke();
+        }
         this.lastX = x;
         this.lastY = y;
     }
@@ -173,6 +184,10 @@ class Board {
 
     setLineType(lineType) {
         this.lineCap = lineType;
+    }
+
+    setMirrorMode(mirrorMode) {
+        this.mirrorMode = mirrorMode;
     }
 
     setRainbowMode(rainbowMode) {
@@ -205,11 +220,26 @@ class Board {
     }
 
     loadImage(imageUrl) {
-        const image = new Image();
-        image.onload = () => {
-            this.context.drawImage(image, 0, 0);
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const image = new Image();
+                    image.onload = () => {
+                        this.canvas.width = image.width;
+                        this.canvas.height = image.height;
+                        this.context.drawImage(image, 0, 0);
+                    };
+                    image.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         };
-        image.src = imageUrl;
+        input.click();
     }
 }
 
@@ -218,5 +248,6 @@ myBoard.setLineWidth(myBoard.lineWidthInput.value);
 myBoard.setLineType(myBoard.lineTypeRound.checked ? 'round' : 'square');
 myBoard.setColor(myBoard.colorPicker.value);
 myBoard.setRainbowMode(myBoard.rainbowMode.checked);
+myBoard.setMirrorMode(myBoard.mirrorMode.checked);
 
 console.log(myBoard.hue);
