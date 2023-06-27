@@ -9,8 +9,7 @@ class Board {
         this.rainbowMode = false;
         this.eraserMode = false;
         this.pickedColor = this.colorPicker;
-        this.history = [];
-        this.historyIndex = -1;
+        this.hue = 0; // Add a hue property to keep track of the current hue value
 
         // Add event listener to window object to make canvas responsive
         this.boardSize = window.addEventListener('resize', this.handleResize.bind(this));
@@ -146,9 +145,10 @@ class Board {
         this.context.beginPath();
         this.context.moveTo(this.lastX, this.lastY);
         this.context.lineTo(x, y);
+        this.hue = (this.hue + 1) % 360; // Increment the hue value
         if (this.rainbowMode) {
-            const hue = (x / this.canvas.width) * 360;
-            this.context.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+            this.context.strokeStyle = `hsl(${this.hue}, 100%, 50%)`;
+            console.log(this.hue); // Use the current hue value
         } else {
             this.context.strokeStyle = this.color;
         }
@@ -219,4 +219,4 @@ myBoard.setLineType(myBoard.lineTypeRound.checked ? 'round' : 'square');
 myBoard.setColor(myBoard.colorPicker.value);
 myBoard.setRainbowMode(myBoard.rainbowMode.checked);
 
-console.log(myBoard);
+console.log(myBoard.hue);
