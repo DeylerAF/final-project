@@ -113,7 +113,6 @@ class Board {
     handleColorChange(e) {
         this.setColor(e.target.value);
         this.pickedColor = e.target.value;
-        !this.rainbowMode ? this.setColor(this.pickedColor) : null;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
         this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
@@ -265,9 +264,11 @@ class Board {
     }
 
     setEraserMode(eraserMode) {
-        this.eraserMode = eraserMode;
-        this.pickedColor = this.colorPicker.value;
-        this.color = eraserMode ? this.boardColor : this.pickedColor;
+        if (eraserMode) {
+            this.context.globalCompositeOperation = 'destination-out';
+        } else {
+            this.context.globalCompositeOperation = 'source-over';
+        }
     }
 
     startDrawing(x, y) {
