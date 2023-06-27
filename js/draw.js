@@ -13,8 +13,7 @@ class Board {
         this.mirrorMode = false; // Add a mirrorMode property to keep track of the mirror mode
 
         // Add event listener to window object to make canvas responsive
-        this.boardSize = window.addEventListener('resize', this.handleResize.bind(this));
-        this.setCanvasDimensions();
+        this.canvas.addEventListener('resize', this.canvasDimensions.bind(this));
 
         this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
         this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
@@ -46,103 +45,87 @@ class Board {
         this.eraserModeCheckbox.addEventListener('change', this.handleEraserModeChange.bind(this));
 
         this.loadImageButton = document.getElementById('load-image');
-        this.loadImageButton.addEventListener('click', this.handleLoadImage.bind(this));
+        this.loadImageButton.addEventListener('click', this.loadImage.bind(this));
 
         this.saveImageButton = document.getElementById('save-image');
-        this.saveImageButton.addEventListener('click', this.handleSaveImage.bind(this));
+        this.saveImageButton.addEventListener('click', this.saveImage.bind(this));
 
         this.clearCanvasButton = document.getElementById('clear-canvas');
-        this.clearCanvasButton.addEventListener('click', this.handleClearCanvas.bind(this));
+        this.clearCanvasButton.addEventListener('click', this.clear.bind(this));
     }
 
-    handleResize() {
-        this.setCanvasDimensions();
-    }
-    
-    setCanvasDimensions() {
+    canvasDimensions() {
         this.canvas.width = this.canvas.parentElement.clientWidth;
         this.canvas.height = this.canvas.parentElement.clientHeight;
     }
 
-    handleMouseDown(event) {
-        const x = event.offsetX;
-        const y = event.offsetY;
+    handleMouseDown(e) {
+        const x = e.offsetX;
+        const y = e.offsetY;
         this.startDrawing(x, y);
     }
 
-    handleMouseMove(event) {
-        const x = event.offsetX;
-        const y = event.offsetY;
+    handleMouseMove(e) {
+        const x = e.offsetX;
+        const y = e.offsetY;
         this.draw(x, y);
     }
 
-    handleMouseUp(event) {
-        this.stopDrawing();
+    handleMouseUp(e) {
+        this.stopDrawing(e);
     }
 
-    handleMouseOut(event) {
-        this.stopDrawing();
+    handleMouseOut(e) {
+        this.stopDrawing(e);
     }
 
-    handleTouchStart(event) {
-        const x = event.touches[0].clientX - this.canvas.offsetLeft;
-        const y = event.touches[0].clientY - this.canvas.offsetTop;
+    handleTouchStart(e) {
+        const x = e.touches[0].clientX - this.canvas.offsetLeft;
+        const y = e.touches[0].clientY - this.canvas.offsetTop;
         this.startDrawing(x, y);
     }
 
-    handleTouchMove(event) {
-        event.preventDefault();
-        const x = event.touches[0].clientX - this.canvas.offsetLeft;
-        const y = event.touches[0].clientY - this.canvas.offsetTop;
+    handleTouchMove(e) {
+        e.preventDefault();
+        const x = e.touches[0].clientX - this.canvas.offsetLeft;
+        const y = e.touches[0].clientY - this.canvas.offsetTop;
         this.draw(x, y);
     }
 
-    handleTouchEnd(event) {
+    handleTouchEnd(e) {
         this.stopDrawing();
     }
 
-    handleLineWidthChange(event) {
-        this.setLineWidth(event.target.value);
+    handleLineWidthChange(e) {
+        this.setLineWidth(e.target.value);
     }
 
-    handleColorChange(event) {
-        this.setColor(event.target.value);
-        this.pickedColor = event.target.value;
+    handleLineTypeChange(e) {
+        this.setLineType(e.target.value);
+    }
+
+    handleColorChange(e) {
+        this.setColor(e.target.value);
+        this.pickedColor = e.target.value;
         !this.rainbowMode ? this.setColor(this.pickedColor) : null;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
     }
 
-    handleLineTypeChange(event) {
-        this.setLineType(event.target.value);
+    handleMirrorModeChange(e) {
+        this.setMirrorMode(e.target.checked);
     }
 
-    handleMirrorModeChange(event) {
-        this.setMirrorMode(event.target.checked);
-    }
-
-    handleRainbowModeChange(event) {
-        this.setRainbowMode(event.target.checked);
+    handleRainbowModeChange(e) {
+        this.setRainbowMode(e.target.checked);
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = true, this.setRainbowMode(true)) : null;
     }
 
-    handleEraserModeChange(event) {
-        this.setEraserMode(event.target.checked);
+    handleEraserModeChange(e) {
+        this.setEraserMode(e.target.checked);
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = true, this.setEraserMode(true)) : null;
-    }
-
-    handleLoadImage(event) {
-        this.loadImage();
-    }
-
-    handleSaveImage(event) {
-        this.saveImage();
-    }
-
-    handleClearCanvas(event) {
-        this.clear();
     }
 
     draw(x, y) {
@@ -219,7 +202,7 @@ class Board {
         link.click();
     }
 
-    loadImage(imageUrl) {
+    loadImage() {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
@@ -227,14 +210,14 @@ class Board {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = (event) => {
+                reader.onload = (e) => {
                     const image = new Image();
                     image.onload = () => {
                         this.canvas.width = image.width;
                         this.canvas.height = image.height;
                         this.context.drawImage(image, 0, 0);
                     };
-                    image.src = event.target.result;
+                    image.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
@@ -244,10 +227,11 @@ class Board {
 }
 
 const myBoard = new Board('board');
+myBoard.canvasDimensions();
 myBoard.setLineWidth(myBoard.lineWidthInput.value);
 myBoard.setLineType(myBoard.lineTypeRound.checked ? 'round' : 'square');
 myBoard.setColor(myBoard.colorPicker.value);
 myBoard.setRainbowMode(myBoard.rainbowMode.checked);
 myBoard.setMirrorMode(myBoard.mirrorMode.checked);
 
-console.log(myBoard.hue);
+console.log(myBoard);
