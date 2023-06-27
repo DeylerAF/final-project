@@ -5,14 +5,17 @@ class Board {
         this.isDrawing = false;
         this.lastX = 0;
         this.lastY = 0;
-        this.color = window.getComputedStyle(this.canvas).colorPicker;
-        this.lineWidth = window.getComputedStyle(this.canvas).lineWidthInput;
         this.boardColor = window.getComputedStyle(this.canvas).backgroundColor;
+        this.rainbowMode = false;
+        this.eraserMode = false;
+        this.pickedColor = this.colorPicker;
+        this.history = [];
+        this.historyIndex = -1;
 
         // Add event listener to window object to make canvas responsive
         this.boardSize = window.addEventListener('resize', this.handleResize.bind(this));
-
         this.setCanvasDimensions();
+
         this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
         this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
         this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
@@ -32,6 +35,9 @@ class Board {
 
         this.lineTypeSquare = document.getElementById('line-type-square');
         this.lineTypeSquare.addEventListener('change', this.handleLineTypeChange.bind(this));
+
+        this.rainbowModeCheckbox = document.getElementById('rainbow-mode');
+        this.rainbowModeCheckbox.addEventListener('change', this.handleRainbowModeChange.bind(this));
 
         this.eraserModeCheckbox = document.getElementById('eraser-mode');
         this.eraserModeCheckbox.addEventListener('change', this.handleEraserModeChange.bind(this));
@@ -98,15 +104,26 @@ class Board {
 
     handleColorChange(event) {
         this.setColor(event.target.value);
+        this.pickedColor = event.target.value;
+        !this.rainbowMode ? this.setColor(this.pickedColor) : null;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
+        this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
     }
 
     handleLineTypeChange(event) {
         this.setLineType(event.target.value);
     }
 
+    handleRainbowModeChange(event) {
+        this.setRainbowMode(event.target.checked);
+        this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
+        this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = true, this.setRainbowMode(true)) : null;
+    }
+
     handleEraserModeChange(event) {
         this.setEraserMode(event.target.checked);
+        this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
+        this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = true, this.setEraserMode(true)) : null;
     }
 
     handleLoadImage(event) {
@@ -129,7 +146,12 @@ class Board {
         this.context.beginPath();
         this.context.moveTo(this.lastX, this.lastY);
         this.context.lineTo(x, y);
-        this.context.strokeStyle = this.color;
+        if (this.rainbowMode) {
+            const hue = (x / this.canvas.width) * 360;
+            this.context.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+        } else {
+            this.context.strokeStyle = this.color;
+        }
         this.context.lineWidth = this.lineWidth;
         this.context.lineCap = this.lineCap;
         this.context.stroke();
@@ -153,9 +175,15 @@ class Board {
         this.lineCap = lineType;
     }
 
+    setRainbowMode(rainbowMode) {
+        this.rainbowMode = rainbowMode;
+        this.rainbowMode ? this.pickedColor = this.colorPicker.value : this.setColor(this.pickedColor);
+    }
+
     setEraserMode(eraserMode) {
         this.eraserMode = eraserMode;
-        this.color = eraserMode ? this.boardColor : this.colorPicker.value;
+        this.pickedColor = this.colorPicker.value;
+        this.color = eraserMode ? this.boardColor : this.pickedColor;
     }
 
     startDrawing(x, y) {
@@ -189,5 +217,6 @@ const myBoard = new Board('board');
 myBoard.setLineWidth(myBoard.lineWidthInput.value);
 myBoard.setLineType(myBoard.lineTypeRound.checked ? 'round' : 'square');
 myBoard.setColor(myBoard.colorPicker.value);
+myBoard.setRainbowMode(myBoard.rainbowMode.checked);
 
 console.log(myBoard);
