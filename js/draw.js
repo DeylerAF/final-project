@@ -6,11 +6,14 @@ class Board {
         this.lastX = 0;
         this.lastY = 0;
         this.boardColor = window.getComputedStyle(this.canvas).backgroundColor;
+        this.mirrorMode = false; // Add a mirrorMode property to keep track of the mirror mode
         this.rainbowMode = false;
+        this.multicolorMode = false;
         this.eraserMode = false;
         this.pickedColor = this.colorPicker;
         this.hue = 0; // Add a hue property to keep track of the current hue value
-        this.mirrorMode = false; // Add a mirrorMode property to keep track of the mirror mode
+        this.saturation = 100; // Add a saturation property to keep track of the current saturation value
+        this.lightness = 50; // Add a lightness property to keep track of the current lightness value
 
         // Add event listener to window object to make canvas responsive
         this.canvas.addEventListener('resize', this.canvasDimensions.bind(this));
@@ -40,6 +43,9 @@ class Board {
 
         this.rainbowModeCheckbox = document.getElementById('rainbow-mode');
         this.rainbowModeCheckbox.addEventListener('change', this.handleRainbowModeChange.bind(this));
+
+        this.multicolorModeCheckbox = document.getElementById('multicolor-mode');
+        this.multicolorModeCheckbox.addEventListener('change', this.handleMulticolorModeChange.bind(this));
 
         this.eraserModeCheckbox = document.getElementById('eraser-mode');
         this.eraserModeCheckbox.addEventListener('change', this.handleEraserModeChange.bind(this));
@@ -110,6 +116,7 @@ class Board {
         !this.rainbowMode ? this.setColor(this.pickedColor) : null;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
+        this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
     }
 
     handleMirrorModeChange(e) {
@@ -119,38 +126,112 @@ class Board {
     handleRainbowModeChange(e) {
         this.setRainbowMode(e.target.checked);
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
+        this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = true, this.setRainbowMode(true)) : null;
+    }
+
+    handleMulticolorModeChange(e) {
+        this.setMulticolorMode(e.target.checked);
+        this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
+        this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
+        this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = true, this.setMulticolorMode(true)) : null;
     }
 
     handleEraserModeChange(e) {
         this.setEraserMode(e.target.checked);
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
+        this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = true, this.setEraserMode(true)) : null;
     }
 
     draw(x, y) {
         if (!this.isDrawing) return;
+
         this.context.beginPath();
         this.context.moveTo(this.lastX, this.lastY);
         this.context.lineTo(x, y);
-        this.hue = (this.hue + 1) % 361; // Increment the hue value
-        if (this.rainbowMode) {
-            this.context.strokeStyle = `hsl(${this.hue}, 100%, 50%)`;
-        } else {
-            this.context.strokeStyle = this.color;
-        }
+
+        this.updateColor();
+        this.context.strokeStyle = this.getColorStyle();
+
         this.context.lineWidth = this.lineWidth;
         this.context.lineCap = this.lineCap;
         this.context.stroke();
-        if (this.mirrorMode) { // Draw a mirrored line if mirrorMode is active
-            const mirrorX = this.canvas.width - x;
-            this.context.beginPath();
-            this.context.moveTo(mirrorX, y);
-            this.context.lineTo(this.canvas.width - this.lastX, this.lastY);
-            this.context.stroke();
+
+        if (this.mirrorMode) {
+            this.drawMirroredLine(x, y);
         }
+
         this.lastX = x;
         this.lastY = y;
+    }
+
+    updateColor() {
+        this.updateHue();
+        this.updateSaturation();
+        this.updateLightness();
+    }
+
+    updateHue() {
+        if (this.hue >= 360) {
+            this.hueDecreasing = true;
+        } else if (this.hue <= 0) {
+            this.hueDecreasing = false;
+        }
+
+        if (this.hueDecreasing) {
+            this.hue -= 1;
+        } else {
+            this.hue += 1;
+        }
+    }
+
+    updateSaturation() {
+        if (this.saturation >= 100) {
+            this.saturationDecreasing = true;
+        } else if (this.saturation <= 0) {
+            this.saturationDecreasing = false;
+        }
+
+        if (this.saturationDecreasing) {
+            this.saturation -= .5;
+        } else {
+            this.saturation += .5;
+        }
+    }
+
+    updateLightness() {
+        if (this.lightness >= 100) {
+            this.lightnessDecreasing = true;
+        } else if (this.lightness <= 0) {
+            this.lightnessDecreasing = false;
+        }
+
+        if (this.lightnessDecreasing) {
+            this.lightness -= .5;
+        } else {
+            this.lightness += .5;
+        }
+    }
+
+    getColorStyle() {
+        if (this.rainbowMode) {
+            console.log(this.hue);
+            return `hsl(${this.hue}, 100%, 50%)`;
+        } else if (this.multicolorMode) {
+            console.log(this.hue, this.saturation, this.lightness);
+            return `hsl(${this.hue}, ${this.saturation}%, ${this.lightness}%)`;
+        } else {
+            return this.color;
+        }
+    }
+
+    drawMirroredLine(x, y) {
+        const mirrorX = this.canvas.width - x;
+        this.context.beginPath();
+        this.context.moveTo(mirrorX, y);
+        this.context.lineTo(this.canvas.width - this.lastX, this.lastY);
+        this.context.stroke();
     }
 
     clear() {
@@ -176,6 +257,11 @@ class Board {
     setRainbowMode(rainbowMode) {
         this.rainbowMode = rainbowMode;
         this.rainbowMode ? this.pickedColor = this.colorPicker.value : this.setColor(this.pickedColor);
+    }
+
+    setMulticolorMode(multicolorMode) {
+        this.multicolorMode = multicolorMode;
+        this.multicolorMode ? this.pickedColor = this.colorPicker.value : this.setColor(this.pickedColor);
     }
 
     setEraserMode(eraserMode) {
@@ -232,6 +318,7 @@ myBoard.setLineWidth(myBoard.lineWidthInput.value);
 myBoard.setLineType(myBoard.lineTypeRound.checked ? 'round' : 'square');
 myBoard.setColor(myBoard.colorPicker.value);
 myBoard.setRainbowMode(myBoard.rainbowMode.checked);
+myBoard.setMulticolorMode(myBoard.multicolorMode.checked);
 myBoard.setMirrorMode(myBoard.mirrorMode.checked);
 
 console.log(myBoard);
