@@ -300,9 +300,9 @@ class Board {
                 reader.onload = (e) => {
                     const image = new Image();
                     image.onload = () => {
-                        this.canvasDimensions();
-                        console.log(image.width, image.height);
-                        this.context.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
+                        this.canvas.width = image.width;
+                        this.canvas.height = image.height;
+                        this.context.drawImage(image, 0, 0);
                     };
                     image.src = e.target.result;
                 };
