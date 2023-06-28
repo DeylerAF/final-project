@@ -18,46 +18,46 @@ class Board {
         // Add event listener to window object to make canvas responsive
         this.canvas.addEventListener('resize', this.canvasDimensions.bind(this));
 
-        this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
-        this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
-        this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
-        this.canvas.addEventListener('mouseout', this.handleMouseOut.bind(this));
-        this.canvas.addEventListener('touchstart', this.handleTouchStart.bind(this));
-        this.canvas.addEventListener('touchmove', this.handleTouchMove.bind(this));
-        this.canvas.addEventListener('touchend', this.handleTouchEnd.bind(this));
+        this.canvas.addEventListener('mousedown', this.getMouseDown.bind(this));
+        this.canvas.addEventListener('mousemove', this.getMouseMove.bind(this));
+        this.canvas.addEventListener('mouseup', this.getMouseUp.bind(this));
+        this.canvas.addEventListener('mouseout', this.getMouseOut.bind(this));
+        this.canvas.addEventListener('touchstart', this.getTouchStart.bind(this));
+        this.canvas.addEventListener('touchmove', this.getTouchMove.bind(this));
+        this.canvas.addEventListener('touchend', this.getTouchEnd.bind(this));
 
         this.lineWidthInput = document.getElementById('line-width');
-        this.lineWidthInput.addEventListener('change', this.handleLineWidthChange.bind(this));
+        this.lineWidthInput.addEventListener('change', this.getLineWidthChange.bind(this));
 
         this.colorPicker = document.getElementById('color-picker');
-        this.colorPicker.addEventListener('change', this.handleColorChange.bind(this));
+        this.colorPicker.addEventListener('change', this.getColorChange.bind(this));
 
         this.lineTypeRound = document.getElementById('line-type-round');
-        this.lineTypeRound.addEventListener('change', this.handleLineTypeChange.bind(this));
+        this.lineTypeRound.addEventListener('change', this.getLineTypeChange.bind(this));
 
         this.lineTypeSquare = document.getElementById('line-type-square');
-        this.lineTypeSquare.addEventListener('change', this.handleLineTypeChange.bind(this));
+        this.lineTypeSquare.addEventListener('change', this.getLineTypeChange.bind(this));
 
         this.mirrorModeCheckbox = document.getElementById('mirror-mode');
-        this.mirrorModeCheckbox.addEventListener('change', this.handleMirrorModeChange.bind(this));
+        this.mirrorModeCheckbox.addEventListener('change', this.getMirrorModeChange.bind(this));
 
         this.rainbowModeCheckbox = document.getElementById('rainbow-mode');
-        this.rainbowModeCheckbox.addEventListener('change', this.handleRainbowModeChange.bind(this));
+        this.rainbowModeCheckbox.addEventListener('change', this.getRainbowModeChange.bind(this));
 
         this.multicolorModeCheckbox = document.getElementById('multicolor-mode');
-        this.multicolorModeCheckbox.addEventListener('change', this.handleMulticolorModeChange.bind(this));
+        this.multicolorModeCheckbox.addEventListener('change', this.getMulticolorModeChange.bind(this));
 
         this.eraserModeCheckbox = document.getElementById('eraser-mode');
-        this.eraserModeCheckbox.addEventListener('change', this.handleEraserModeChange.bind(this));
+        this.eraserModeCheckbox.addEventListener('change', this.getEraserModeChange.bind(this));
 
         this.loadImageButton = document.getElementById('load-image');
-        this.loadImageButton.addEventListener('click', this.loadImage.bind(this));
+        this.loadImageButton.addEventListener('click', this.getLoadImage.bind(this));
 
         this.saveImageButton = document.getElementById('save-image');
-        this.saveImageButton.addEventListener('click', this.saveImage.bind(this));
+        this.saveImageButton.addEventListener('click', this.getSaveImage.bind(this));
 
         this.clearCanvasButton = document.getElementById('clear-canvas');
-        this.clearCanvasButton.addEventListener('click', this.clear.bind(this));
+        this.clearCanvasButton.addEventListener('click', this.getClear.bind(this));
     }
 
     canvasDimensions() {
@@ -65,52 +65,52 @@ class Board {
         this.canvas.height = this.canvas.parentElement.clientHeight;
     }
 
-    handleMouseDown(e) {
+    getMouseDown(e) {
         const x = e.offsetX;
         const y = e.offsetY;
         this.startDrawing(x, y);
     }
 
-    handleMouseMove(e) {
+    getMouseMove(e) {
         const x = e.offsetX;
         const y = e.offsetY;
         this.draw(x, y);
     }
 
-    handleMouseUp(e) {
+    getMouseUp(e) {
         this.stopDrawing(e);
     }
 
-    handleMouseOut(e) {
+    getMouseOut(e) {
         this.stopDrawing(e);
     }
 
-    handleTouchStart(e) {
+    getTouchStart(e) {
         const x = e.touches[0].clientX - this.canvas.offsetLeft;
         const y = e.touches[0].clientY - this.canvas.offsetTop;
         this.startDrawing(x, y);
     }
 
-    handleTouchMove(e) {
+    getTouchMove(e) {
         e.preventDefault();
         const x = e.touches[0].clientX - this.canvas.offsetLeft;
         const y = e.touches[0].clientY - this.canvas.offsetTop;
         this.draw(x, y);
     }
 
-    handleTouchEnd(e) {
+    getTouchEnd(e) {
         this.stopDrawing();
     }
 
-    handleLineWidthChange(e) {
+    getLineWidthChange(e) {
         this.setLineWidth(e.target.value);
     }
 
-    handleLineTypeChange(e) {
+    getLineTypeChange(e) {
         this.setLineType(e.target.value);
     }
 
-    handleColorChange(e) {
+    getColorChange(e) {
         this.setColor(e.target.value);
         this.pickedColor = e.target.value;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
@@ -118,29 +118,37 @@ class Board {
         this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
     }
 
-    handleMirrorModeChange(e) {
+    getMirrorModeChange(e) {
         this.setMirrorMode(e.target.checked);
     }
 
-    handleRainbowModeChange(e) {
+    getRainbowModeChange(e) {
         this.setRainbowMode(e.target.checked);
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
         this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = true, this.setRainbowMode(true)) : null;
     }
 
-    handleMulticolorModeChange(e) {
+    getMulticolorModeChange(e) {
         this.setMulticolorMode(e.target.checked);
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
         this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = true, this.setMulticolorMode(true)) : null;
     }
 
-    handleEraserModeChange(e) {
+    getEraserModeChange(e) {
         this.setEraserMode(e.target.checked);
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
         this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = true, this.setEraserMode(true)) : null;
+    }
+
+    getSaveImage(e) {
+        this.setSaveImage();
+        }
+        
+    getLoadImage(e) {
+    this.setLoadImage();
     }
 
     draw(x, y) {
@@ -233,8 +241,13 @@ class Board {
         this.context.stroke();
     }
 
-    clear() {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    getClear(e) {
+        this.setClear(e);
+    }
+
+    setClear(clear) {
+        this.clear = clear;
+        clear = this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     setColor(colorPicker) {
@@ -281,7 +294,7 @@ class Board {
         this.isDrawing = false;
     }
 
-    saveImage() {
+    setSaveImage() {
         const dataUrl = this.canvas.toDataURL();
         const link = document.createElement('a');
         link.download = 'myImage.png';
@@ -289,7 +302,7 @@ class Board {
         link.click();
     }
 
-    loadImage() {
+    setLoadImage() {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
