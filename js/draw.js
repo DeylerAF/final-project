@@ -4,6 +4,7 @@ class Board extends Events {
     constructor(canvasId) {
         super(canvasId);
         this.isDrawing = false;
+        this.clear = false;
         this.lastX = 0;
         this.lastY = 0;
         this.boardColor = window.getComputedStyle(this.canvas).backgroundColor;
@@ -16,6 +17,11 @@ class Board extends Events {
         this.saturation = 100; // Add a saturation property to keep track of the current saturation value
         this.lightness = 50; // Add a lightness property to keep track of the current lightness value
 
+    }
+
+    canvasDimensions() {
+        this.canvas.width = this.canvas.parentElement.clientWidth;
+        this.canvas.height = this.canvas.parentElement.clientHeight;
     }
 
     draw(x, y) {
@@ -108,10 +114,6 @@ class Board extends Events {
         this.context.stroke();
     }
 
-    clear() {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-
     startDrawing(x, y) {
         this.isDrawing = true;
         this.lastX = x;
@@ -122,14 +124,48 @@ class Board extends Events {
         this.isDrawing = false;
     }
 
+    clearCanvas(clear) {
+        clear = this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 
+    saveImage() {
+        const dataUrl = this.canvas.toDataURL();
+        const link = document.createElement('a');
+        link.download = 'myImage.png';
+        link.href = dataUrl;
+        link.click();
+    }
+
+    loadImage() {
+                const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const image = new Image();
+                    image.onload = () => {
+                        this.setCanvasDimensions();
+                        console.log(image.width, image.height);
+                        this.context.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
+                    };
+                    image.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    }
 }
 
 const myBoard = new Board('board');
-myBoard.setCanvasDimensions();
+myBoard.canvasDimensions();
 myBoard.setLineWidth(myBoard.lineWidthInput.value);
 myBoard.setLineType(myBoard.lineTypeRound.checked ? 'round' : 'square');
 myBoard.setColor(myBoard.colorPicker.value);
+myBoard.setEraserMode(myBoard.rainbowMode.checked);
 myBoard.setRainbowMode(myBoard.rainbowMode.checked);
 myBoard.setMulticolorMode(myBoard.multicolorMode.checked);
 myBoard.setMirrorMode(myBoard.mirrorMode.checked);

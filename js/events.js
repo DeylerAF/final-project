@@ -68,6 +68,7 @@ export default class Events {
     }
 
     getMouseMove(e) {
+        e.preventDefault();
         const x = e.offsetX;
         const y = e.offsetY;
         this.draw(x, y);
@@ -152,8 +153,7 @@ export default class Events {
     }
 
     setCanvasDimensions() {
-        this.canvas.width = this.canvas.parentElement.clientWidth;
-        this.canvas.height = this.canvas.parentElement.clientHeight;
+        this.canvasDimensions();
     }
 
     setColor(colorPicker) {
@@ -190,39 +190,15 @@ export default class Events {
         }
     }
 
-    setClear(clear) {
-        this.clear = clear;
-        clear = this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    setClear() {
+        this.clearCanvas();
     }
 
     setSaveImage() {
-        const dataUrl = this.canvas.toDataURL();
-        const link = document.createElement('a');
-        link.download = 'myImage.png';
-        link.href = dataUrl;
-        link.click();
+        this.saveImage();
     }
 
     setLoadImage() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const image = new Image();
-                    image.onload = () => {
-                        this.setCanvasDimensions();
-                        console.log(image.width, image.height);
-                        this.context.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
-                    };
-                    image.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        input.click();
+        this.loadImage();
     }
 }
