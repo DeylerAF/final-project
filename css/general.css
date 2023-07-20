@@ -7,27 +7,4 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color : #f1f1f1;
     background-color: #181818;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-}
-
-h1 {
-    margin: 0;
-}
-
-.control-panel{
-    display: block;
-    margin: 0;
-    padding: 0;
-    width: 25%;
-    height: 100%;
-}
-
-#board-container{
-    border: 1px solid #fff;
-    width: 75%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
 }

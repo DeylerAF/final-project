@@ -2,28 +2,25 @@ import Events from './events.js';
 
 class Board extends Events {
     constructor(canvasId) {
-        super(canvasId);
-        this.isDrawing = false;
-        this.clear = false;
-        this.lastX = 0;
-        this.lastY = 0;
-        this.boardColor = window.getComputedStyle(this.canvas).backgroundColor;
+        super(canvasId); // Call the constructor of the Events class
+        this.isDrawing = false; // Add an isDrawing property to keep track of when the user is drawing
+        this.clear = false; // Add a clear property to keep track of when the user is clearing the canvas
+        this.lastX = 0; // Add lastX properties to keep track of the last position of the mouse
+        this.lastY = 0; // Add lastY properties to keep track of the last position of the mouse
         this.mirrorMode = false; // Add a mirrorMode property to keep track of the mirror mode
-        this.rainbowMode = false;
-        this.multicolorMode = false;
-        this.eraserMode = false;
-        this.pickedColor = this.colorPicker;
+        this.rainbowMode = false; // Add a rainbowMode property to keep track of the rainbow mode
+        this.eraserMode = false; // Add a eraserMode property to keep track of the eraser mode
+        this.pickedColor = this.colorPicker; // Add a pickedColor property to keep track of the picked color
         this.hue = 0; // Add a hue property to keep track of the current hue value
-        this.saturation = 100; // Add a saturation property to keep track of the current saturation value
-        this.lightness = 50; // Add a lightness property to keep track of the current lightness value
-
     }
 
+    /* Dimensions properties*/
     canvasDimensions() {
         this.canvas.width = this.canvas.parentElement.clientWidth;
         this.canvas.height = this.canvas.parentElement.clientHeight;
     }
 
+    /* Draw tools properties */
     draw(x, y) {
         if (!this.isDrawing) return;
 
@@ -46,10 +43,19 @@ class Board extends Events {
         this.lastY = y;
     }
 
+    startDrawing(x, y) {
+        this.isDrawing = true;
+        this.lastX = x;
+        this.lastY = y;
+    }
+
+    stopDrawing() {
+        this.isDrawing = false;
+    }
+
+    /* Rainbow mode properties */
     updateColor() {
         this.updateHue();
-        this.updateSaturation();
-        this.updateLightness();
     }
 
     updateHue() {
@@ -66,46 +72,15 @@ class Board extends Events {
         }
     }
 
-    updateSaturation() {
-        if (this.saturation >= 100) {
-            this.saturationDecreasing = true;
-        } else if (this.saturation <= 0) {
-            this.saturationDecreasing = false;
-        }
-
-        if (this.saturationDecreasing) {
-            this.saturation -= .5;
-        } else {
-            this.saturation += .5;
-        }
-    }
-
-    updateLightness() {
-        if (this.lightness >= 100) {
-            this.lightnessDecreasing = true;
-        } else if (this.lightness <= 0) {
-            this.lightnessDecreasing = false;
-        }
-
-        if (this.lightnessDecreasing) {
-            this.lightness -= .5;
-        } else {
-            this.lightness += .5;
-        }
-    }
-
     updateColorStyle() {
         if (this.rainbowMode) {
-            console.log(this.hue);
             return `hsl(${this.hue}, 100%, 50%)`;
-        } else if (this.multicolorMode) {
-            console.log(this.hue, this.saturation, this.lightness);
-            return `hsl(${this.hue}, ${this.saturation}%, ${this.lightness}%)`;
         } else {
             return this.color;
         }
     }
 
+    /* Mirror mode properties */
     drawMirroredLine(x, y) {
         const mirrorX = this.canvas.width - x;
         this.context.beginPath();
@@ -114,24 +89,15 @@ class Board extends Events {
         this.context.stroke();
     }
 
-    startDrawing(x, y) {
-        this.isDrawing = true;
-        this.lastX = x;
-        this.lastY = y;
-    }
-
-    stopDrawing() {
-        this.isDrawing = false;
-    }
-
+    /* File tools properties */
     clearCanvas(clear) {
         clear = this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     saveImage() {
-        const dataUrl = this.canvas.toDataURL();
+        const dataUrl = this.canvas.toDataURL('image/jpeg');
         const link = document.createElement('a');
-        link.download = 'myImage.png';
+        link.download = 'canvas.jpg';
         link.href = dataUrl;
         link.click();
     }
@@ -148,7 +114,6 @@ class Board extends Events {
                     const image = new Image();
                     image.onload = () => {
                         this.setCanvasDimensions();
-                        console.log(image.width, image.height);
                         this.context.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
                     };
                     image.src = e.target.result;
@@ -160,14 +125,11 @@ class Board extends Events {
     }
 }
 
-const myBoard = new Board('board');
-myBoard.canvasDimensions();
-myBoard.setLineWidth(myBoard.lineWidthInput.value);
-myBoard.setLineType(myBoard.lineTypeRound.checked ? 'round' : 'square');
-myBoard.setColor(myBoard.colorPicker.value);
-myBoard.setEraserMode(myBoard.rainbowMode.checked);
-myBoard.setRainbowMode(myBoard.rainbowMode.checked);
-myBoard.setMulticolorMode(myBoard.multicolorMode.checked);
-myBoard.setMirrorMode(myBoard.mirrorMode.checked);
-
-console.log(myBoard);
+const myBoard = new Board('board'); // Create a new instance of the Board class
+myBoard.canvasDimensions(); // Set the canvas dimensions
+myBoard.setLineWidth(myBoard.lineWidthInput.value); // Set the line width
+myBoard.setLineType(myBoard.lineTypeRound.checked ? 'round' : 'square'); // Set the line type
+myBoard.setColor(myBoard.colorPicker.value); // Set the color
+myBoard.setEraserMode(myBoard.eraserMode.checked); // Set the eraser mode
+myBoard.setRainbowMode(myBoard.rainbowMode.checked); // Set the rainbow mode
+myBoard.setMirrorMode(myBoard.mirrorMode.checked);  // Set the mirror mode

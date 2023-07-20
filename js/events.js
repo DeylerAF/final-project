@@ -1,10 +1,11 @@
 export default class Events {
     constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.context = this.canvas.getContext('2d', { willReadFrequently: true });
+        this.canvas = document.getElementById(canvasId); // Canvas element
+        this.context = this.canvas.getContext('2d', { willReadFrequently: true }); // Canvas context
 
-        this.canvas.addEventListener('resize', this.getCanvasDimensions.bind(this));
+        this.canvas.addEventListener('resize', this.getCanvasDimensions.bind(this)); // Canvas resize event
 
+        /* Canvas cursor events */
         this.canvas.addEventListener('mousedown', this.getMouseDown.bind(this));
         this.canvas.addEventListener('mousemove', this.getMouseMove.bind(this));
         this.canvas.addEventListener('mouseup', this.getMouseUp.bind(this));
@@ -13,6 +14,7 @@ export default class Events {
         this.canvas.addEventListener('touchmove', this.getTouchMove.bind(this));
         this.canvas.addEventListener('touchend', this.getTouchEnd.bind(this));
 
+        /* Canvas draw tools events */
         this.lineWidthInput = document.getElementById('line-width');
         this.lineWidthInput.addEventListener('change', this.getLineWidthChange.bind(this));
 
@@ -31,12 +33,10 @@ export default class Events {
         this.rainbowModeCheckbox = document.getElementById('rainbow-mode');
         this.rainbowModeCheckbox.addEventListener('change', this.getRainbowModeChange.bind(this));
 
-        this.multicolorModeCheckbox = document.getElementById('multicolor-mode');
-        this.multicolorModeCheckbox.addEventListener('change', this.getMulticolorModeChange.bind(this));
-
         this.eraserModeCheckbox = document.getElementById('eraser-mode');
         this.eraserModeCheckbox.addEventListener('change', this.getEraserModeChange.bind(this));
 
+        /* Canvas file tools events */
         this.loadImageButton = document.getElementById('load-image');
         this.loadImageButton.addEventListener('click', this.getLoadImage.bind(this));
 
@@ -46,10 +46,12 @@ export default class Events {
         this.clearCanvasButton = document.getElementById('clear-canvas');
         this.clearCanvasButton.addEventListener('click', this.getClear.bind(this));
 
+        /* Resize canvas when screen change size */
         this.resizeObserver = new ResizeObserver(this.getCanvasDimensions.bind(this));
         this.resizeObserver.observe(this.canvas.parentElement);
     }
 
+    /* Get canvas dimensions */
     getCanvasDimensions() {
         // Save the current state of the canvas
         const imageData = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
@@ -61,6 +63,7 @@ export default class Events {
         this.context.putImageData(imageData, 0, 0);
     }
 
+    /* Get cursor events */
     getMouseDown(e) {
         const x = e.offsetX;
         const y = e.offsetY;
@@ -96,9 +99,10 @@ export default class Events {
     }
 
     getTouchEnd(e) {
-        this.stopDrawing();
+        this.stopDrawing(e);
     }
 
+    /* Get tools events */
     getLineWidthChange(e) {
         this.setLineWidth(e.target.value);
     }
@@ -112,7 +116,6 @@ export default class Events {
         this.pickedColor = e.target.value;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
-        this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
     }
 
     getMirrorModeChange(e) {
@@ -122,24 +125,16 @@ export default class Events {
     getRainbowModeChange(e) {
         this.setRainbowMode(e.target.checked);
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
-        this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = true, this.setRainbowMode(true)) : null;
-    }
-
-    getMulticolorModeChange(e) {
-        this.setMulticolorMode(e.target.checked);
-        this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = false, this.setEraserMode(false)) : null;
-        this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
-        this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = true, this.setMulticolorMode(true)) : null;
     }
 
     getEraserModeChange(e) {
         this.setEraserMode(e.target.checked);
         this.rainbowModeCheckbox.checked ? (this.rainbowModeCheckbox.checked = false, this.setRainbowMode(false)) : null;
-        this.multicolorModeCheckbox.checked ? (this.multicolorModeCheckbox.checked = false, this.setMulticolorMode(false)) : null;
         this.eraserModeCheckbox.checked ? (this.eraserModeCheckbox.checked = true, this.setEraserMode(true)) : null;
     }
 
+    /* Get file tools events */
     getClear(e) {
         this.setClear(e);
     }
@@ -152,10 +147,12 @@ export default class Events {
         this.setLoadImage(e);
     }
 
+    /* Set cursor events */
     setCanvasDimensions() {
         this.canvasDimensions();
     }
 
+    /* Set draw tools events */
     setColor(colorPicker) {
         this.color = colorPicker;
     }
@@ -177,11 +174,6 @@ export default class Events {
         this.rainbowMode ? this.pickedColor = this.colorPicker.value : this.setColor(this.pickedColor);
     }
 
-    setMulticolorMode(multicolorMode) {
-        this.multicolorMode = multicolorMode;
-        this.multicolorMode ? this.pickedColor = this.colorPicker.value : this.setColor(this.pickedColor);
-    }
-
     setEraserMode(eraserMode) {
         if (eraserMode) {
             this.context.globalCompositeOperation = 'destination-out';
@@ -190,6 +182,7 @@ export default class Events {
         }
     }
 
+    /* Set file tools events */
     setClear() {
         this.clearCanvas();
     }

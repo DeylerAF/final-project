@@ -1,0 +1,181 @@
+.control-panel {
+    display: block;
+    margin: 0;
+    padding: 0;
+    width: 25%;
+    min-width: 300px;
+}
+
+.headings {
+    font-size: 1em;
+    padding: 0.5em;
+    margin: 1rem 0.5rem;
+    text-align: center;
+    color: #df9241;
+}
+
+.panel-tools {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.draw-tools {
+    padding: 1.5rem;
+    margin: 1rem;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    min-width: 250px;
+}
+
+.draw-tool {
+    display: flex;
+    margin: 1rem 0;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-icon {
+    width: 50px;
+    height: 50px;
+    padding: 1rem;
+    margin: 0.5rem;
+    border: 2px solid #fff;
+    cursor: pointer;
+    transition: all 0.4s;
+    border-radius: 10px;
+    background-color: #df9241;
+    box-shadow: 0 1px 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.btn-icon:hover {
+    background-color: #a8347b;
+    box-shadow: 0 1px 0 1px rgba(168, 52, 123, 0.5);
+}
+
+.btn-icon:active {
+    transform: scale(0.9);
+}
+
+/* Range style */
+
+.range{
+    margin: 0 1rem;
+    max-width: 100px;
+    cursor: pointer;
+}
+
+output {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    padding: .5rem;
+    margin: .25rem;
+    width: 30px;
+    height: 30px;
+}
+
+/* Color picker style */
+
+.color-picker {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 50px;
+    height: 50px;
+    background: none;
+    cursor: pointer;
+}
+
+.color-picker::-webkit-color-swatch {
+    border-radius: 100%;
+    border: 2px solid #fff;
+}
+
+.color-picker::-moz-color-swatch {
+    border-radius: 100%;
+    border: 2px solid #fff;
+}
+
+/* Radio style */
+
+.radio-button input[type="radio"] {
+    display: none;
+}
+
+.radio-button label {
+    padding: 0 .5rem;
+    border: 2px solid #fff;
+    cursor: pointer;
+    transition: all 0.4s;
+    border-radius: 10px;
+    background-color: none;
+    box-shadow: 0 1px 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.radio-button:hover label:hover {
+    background-color: #df9241;
+}
+
+.radio-button input[type="radio"]:checked+label {
+    background-color: #df9241;
+}
+
+/* Switch for checkbox */
+.switch {
+    width: 80px;
+    height: 26px;
+    background: #333;
+    position: relative;
+    border-radius: 50px;
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5),
+        0px 1px 0px rgba(255, 255, 255, 0.2);
+}
+
+.switch:after {
+    content: "OFF";
+    color: #000;
+    position: absolute;
+    right: 10px;
+    z-index: 0;
+    font: 12px/26px Arial, sans-serif;
+    font-weight: bold;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);
+}
+
+.switch:before {
+    content: "ON";
+    color: green;
+    position: absolute;
+    left: 10px;
+    z-index: 0;
+    font: 12px/26px Arial, sans-serif;
+    font-weight: bold;
+}
+
+.switch label {
+    display: block;
+    width: 34px;
+    height: 20px;
+    cursor: pointer;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 1;
+    background: #df9241;
+    background: linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+    border-radius: 50px;
+    transition: all 0.4s ease;
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
+}
+
+.switch input[type="checkbox"] {
+    visibility: hidden;
+}
+
+.switch input[type="checkbox"]:checked+label {
+    left: 43px;
+}
